@@ -47,21 +47,24 @@ export function SignMessage() {
 
       // Handle different response formats and convert byte array to hex
       let signature: string;
-      
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sig = response.signature as any;
+
       if (typeof response === 'string') {
         signature = response;
-      } else if (response.signature?.data?.data) {
-        // Convert byte array to hex string
-        const byteArray = Object.values(response.signature.data.data) as number[];
+      } else if (sig?.data?.data) {
+        // Convert byte array to hex string (some wallets return this format)
+        const byteArray = Object.values(sig.data.data) as number[];
         signature = '0x' + byteArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
       } else if (response.signature) {
-        signature = typeof response.signature === 'string' 
-          ? response.signature 
+        signature = typeof response.signature === 'string'
+          ? response.signature
           : JSON.stringify(response.signature);
       } else {
         signature = JSON.stringify(response);
       }
-      
+
       setSignedMessage(signature);
 
       toast.success(
@@ -93,7 +96,7 @@ export function SignMessage() {
         <p className="text-muted-foreground">
           Sign a "gmove" message with your wallet.
         </p>
-        
+
         <div className="space-y-2">
           <label className="text-sm font-medium">Your Name</label>
           <Input
@@ -113,7 +116,7 @@ export function SignMessage() {
           </div>
         )}
 
-        <Button 
+        <Button
           onClick={handleSignMessage}
           disabled={isLoading || !account || !signMessage}
           className="w-full"

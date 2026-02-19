@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { getAptosWallets } from "@aptos-labs/wallet-standard";
+import { Network } from "@aptos-labs/wallet-adapter-core";
 
 interface WalletSelectionModalProps {
   children: React.ReactNode;
@@ -25,9 +26,9 @@ export function WalletSelectionModal({ children }: WalletSelectionModalProps) {
   const filteredWallets = wallets
     .filter((wallet) => {
       const name = wallet.name.toLowerCase();
-      return !name.includes("petra") && 
-             !name.includes("google") && 
-             !name.includes("apple");
+      return !name.includes("petra") &&
+        !name.includes("google") &&
+        !name.includes("apple");
     })
     .filter((wallet, index, self) => {
       // Remove duplicates based on wallet name
@@ -46,18 +47,18 @@ export function WalletSelectionModal({ children }: WalletSelectionModalProps) {
       if (typeof window !== "undefined") {
         const allWallets = getAptosWallets();
         const selectedWallet = allWallets.aptosWallets.find(w => w.name === walletName);
-        
+
         if (selectedWallet?.features?.['aptos:connect']) {
           // Use wallet-standard aptos:connect feature with network info
           const networkInfo = {
-            chainId: 126, // Movement Mainnet
-            name: "custom" as const,
-            url: "https://full.mainnet.movementinfra.xyz/v1"
+            chainId: 250, // Movement Testnet (Bardock)
+            name: Network.CUSTOM,
+            url: "https://aptos.testnet.porto.movementlabs.xyz/v1"
           };
-          
+
           try {
             const result = await selectedWallet.features['aptos:connect'].connect(false, networkInfo);
-            
+
             // If wallet-standard connection succeeded, now connect via wallet adapter
             if (result.status === "Approved") {
               await connect(walletName);
@@ -69,7 +70,7 @@ export function WalletSelectionModal({ children }: WalletSelectionModalProps) {
           }
         }
       }
-      
+
       // Fallback to standard wallet adapter connection
       await connect(walletName);
       setOpen(false);
@@ -92,9 +93,19 @@ export function WalletSelectionModal({ children }: WalletSelectionModalProps) {
         </DialogHeader>
         <div className="space-y-3">
           {filteredWallets.length === 0 ? (
-            <p className="text-center text-muted-foreground py-4">
-              No compatible wallets detected. Please install a supported wallet.
-            </p>
+            <div className="text-center py-6 space-y-3">
+              <p className="text-muted-foreground text-sm">
+                No compatible wallets detected.
+              </p>
+              <a
+                href="https://chromewebstore.google.com/detail/nightly/fiikommddbeccaoicoejoniammnalkfa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+              >
+                Install Nightly Wallet ↗
+              </a>
+            </div>
           ) : (
             filteredWallets.map((wallet) => (
               <Button
@@ -105,9 +116,9 @@ export function WalletSelectionModal({ children }: WalletSelectionModalProps) {
               >
                 <div className="flex items-center space-x-3">
                   {wallet.icon && (
-                    <img 
-                      src={wallet.icon} 
-                      alt={wallet.name} 
+                    <img
+                      src={wallet.icon}
+                      alt={wallet.name}
                       className="w-6 h-6"
                     />
                   )}

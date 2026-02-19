@@ -17,8 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Movement Network - Connect Wallet Template",
-  description: "A Next.js template for building dApps on Movement Network with wallet integration",
+  title: "ClawBot Skill Builder | Movement Network",
+  description:
+    "Deploy your personal OpenClaw AI agent on Movement Network. Build custom skills for DeFi, DEXes, and Web3 apps — then register on-chain.",
 };
 
 export default function RootLayout({
